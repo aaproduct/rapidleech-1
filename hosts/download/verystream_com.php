@@ -5,11 +5,11 @@ if (!defined('RAPIDLEECH')) {
 	exit;
 }
 
-class openload_co extends DownloadClass {
-	private $page, $cookie = array(), $elink, $pA, $DLRegexp = '@https?://\w+\.(?:openload\.co|oloadcdn\.net)/dl/[^\t\r\n\'\"<>\?]+@i';
+class verystream_com extends DownloadClass {
+	private $page, $cookie = array(), $elink, $pA, $DLRegexp = '@https?://\w+\.(?:verystream\.com)/dl/[^\t\r\n\'\"<>\?]+@i';
 	private $ignoreApiDLCaptcha = false;
 	public function Download($link) {
-		if (!preg_match('@https?://openload\.co/f/([\w-]+)@i', str_ireplace(array('://www.openload.co', '/embed/'), array('://openload.co', '/f/'), $link), $fid)) html_error('Invalid link?.');
+		if (!preg_match('@https?://verystream\.com/f/([\w-]+)@i', str_ireplace(array('://verystream.com', '/embed/'), array('://verystream.com', '/stream/'), $link), $fid)) html_error('Invalid link?.');
 		$this->link = $GLOBALS['Referer'] = str_ireplace('http://', 'https://', $fid[0]);
 		$this->elink = str_ireplace('/f/', '/embed/', $this->link);
 		$this->fid = $fid[1];
@@ -19,9 +19,9 @@ class openload_co extends DownloadClass {
 		else if ($_POST['step'] == '42') return $this->processAnswer();
 
 		$this->pA = (empty($_REQUEST['premium_user']) || empty($_REQUEST['premium_pass']) ? false : true);
-		if (($_REQUEST['premium_acc'] == 'on' && ($this->pA || (!empty($GLOBALS['premium_acc']['openload_co']['user']) && !empty($GLOBALS['premium_acc']['openload_co']['pass']))))) {
-			$user = ($this->pA ? $_REQUEST['premium_user'] : $GLOBALS['premium_acc']['openload_co']['user']);
-			$pass = ($this->pA ? $_REQUEST['premium_pass'] : $GLOBALS['premium_acc']['openload_co']['pass']);
+		if (($_REQUEST['premium_acc'] == 'on' && ($this->pA || (!empty($GLOBALS['premium_acc']['verystream_com']['user']) && !empty($GLOBALS['premium_acc']['verystream_com']['pass']))))) {
+			$user = ($this->pA ? $_REQUEST['premium_user'] : $GLOBALS['premium_acc']['verystream_com']['user']);
+			$pass = ($this->pA ? $_REQUEST['premium_pass'] : $GLOBALS['premium_acc']['verystream_com']['pass']);
 			if ($this->pA && !empty($_POST['pA_encrypted'])) {
 				$user = decrypt(urldecode($user));
 				$pass = decrypt(urldecode($pass));
@@ -113,7 +113,7 @@ class openload_co extends DownloadClass {
 	private function testStreamToken($token) {
 		if (!preg_match($this->DLRegexp, $token, $DL)) {
 			if (!preg_match("@{$this->fid}~\d{10}~(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)~[\w\-]{8}(?:\?|$)@", $token)) return false;
-			$page = $this->GetPage("https://openload.co/stream/$token?mime=true");
+			$page = $this->GetPage("https://verystream.com/stream/$token?mime=true");
 			if (!preg_match($this->DLRegexp, $page, $DL)) return html_error('Stream Download-Link Not Found.');
 			if ($this->fid != 'KDA_8nZ2av4' && strpos($DL[0], '/KDA_8nZ2av4/x.mp4') !== false) return false; // :P
 		}
@@ -145,10 +145,10 @@ class openload_co extends DownloadClass {
 		$isApiLogin = (strpos($user, '@') === false ? true : false);
 
 		// ApiDL
-		if ($isApiLogin || (!$this->pA && !empty($GLOBALS['premium_acc']['openload_co']['apiuser']) && !empty($GLOBALS['premium_acc']['openload_co']['apipass']))) {
+		if ($isApiLogin || (!$this->pA && !empty($GLOBALS['premium_acc']['verystream_com]['apiuser']) && !empty($GLOBALS['premium_acc']['verystream_com']['apipass']))) {
 			try {
 				if ($isApiLogin) return $this->tryApiDL($user, $pass);
-				else return $this->tryApiDL($GLOBALS['premium_acc']['openload_co']['apiuser'], $GLOBALS['premium_acc']['openload_co']['apipass']);
+				else return $this->tryApiDL($GLOBALS['premium_acc']['verystream_com']['apiuser'], $GLOBALS['premium_acc']['verystream_com']['apipass']);
 			} catch (Exception $e) {
 				if ($this->pA) html_error('Login_ApiDL Failed: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES));
 				else $this->changeMesg(sprintf('<br /><b>Login_ApiDL Failed: "%s"</b>', htmlspecialchars($e->getMessage(), ENT_QUOTES)), true);
@@ -185,7 +185,7 @@ class openload_co extends DownloadClass {
 		if (!is_array($query)) $query = array();
 
 		$query = !empty($query) ? '?'.http_build_query($query, '', '&') : '';
-		$page = $this->GetPage("https://api.openload.co/1/$path$query", 0, 0, 'https://openload.co/');
+		$page = $this->GetPage("https://api.verystream.com/1/$path$query", 0, 0, 'https://verystream.com/');
 		$reply = $this->json2array($page, "ApiReq($path) Error");
 
 		switch ($reply['status']) {
