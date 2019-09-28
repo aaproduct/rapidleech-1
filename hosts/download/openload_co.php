@@ -6,10 +6,10 @@ if (!defined('RAPIDLEECH')) {
 }
 
 class openload_co extends DownloadClass {
-	private $page, $cookie = array(), $elink, $pA, $DLRegexp = '@https?://\w+\.(?:openload\.co|oloadcdn\.net)/dl/[^\t\r\n\'\"<>\?]+@i';
+	private $page, $cookie = array(), $elink, $pA, $DLRegexp = '@https?://\w+\.(?:verystream\.com)/dl/[^\t\r\n\'\"<>\?]+@i';
 	private $ignoreApiDLCaptcha = false;
 	public function Download($link) {
-		if (!preg_match('@https?://openload\.co/f/([\w-]+)@i', str_ireplace(array('://www.openload.co', '/embed/'), array('://openload.co', '/f/'), $link), $fid)) html_error('Invalid link?.');
+		if (!preg_match('@https?://verystream\.com/f/([\w-]+)@i', str_ireplace(array('://verystream.com', '/embed/'), array('://verystream.com', '/stream/'), $link), $fid)) html_error('Invalid link?.');
 		$this->link = $GLOBALS['Referer'] = str_ireplace('http://', 'https://', $fid[0]);
 		$this->elink = str_ireplace('/f/', '/embed/', $this->link);
 		$this->fid = $fid[1];
@@ -113,7 +113,7 @@ class openload_co extends DownloadClass {
 	private function testStreamToken($token) {
 		if (!preg_match($this->DLRegexp, $token, $DL)) {
 			if (!preg_match("@{$this->fid}~\d{10}~(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)~[\w\-]{8}(?:\?|$)@", $token)) return false;
-			$page = $this->GetPage("https://openload.co/stream/$token?mime=true");
+			$page = $this->GetPage("https://verystream.com/stream/$token?mime=true");
 			if (!preg_match($this->DLRegexp, $page, $DL)) return html_error('Stream Download-Link Not Found.');
 			if ($this->fid != 'KDA_8nZ2av4' && strpos($DL[0], '/KDA_8nZ2av4/x.mp4') !== false) return false; // :P
 		}
@@ -166,7 +166,7 @@ class openload_co extends DownloadClass {
 		$post['LoginForm%5Bpassword%5D'] = urlencode($pass);
 		$post['LoginForm%5BrememberMe%5D'] = 1;
 
-		$page = $this->GetPage('https://openload.co/login', $this->cookie, $post);
+		$page = $this->GetPage('https://verystream.com/login', $this->cookie, $post);
 		is_present($page, 'Incorrect username or password.', 'Login Error: Wrong Email/Password.');
 		$this->cookie = GetCookiesArr($page, $this->cookie);
 		if (empty($this->cookie['_identity'])) html_error('Login Error: Cookie "_identity" not Found.');
